@@ -7,7 +7,7 @@ url = 'https://pomber.github.io/covid19/timeseries.json'
 response = requests.request("GET", url)
 data = response.json()
 
-ans = input("Enter the name of the country to know how long it took for that country to become a recovery state.\n")
+ans = input("Enter the name of the country to see its predicted data.\n")
 if (ans.lower() == 'usa') or (ans.lower() == 'us') or (ans.lower() == 'states') or (ans.lower() == 'united states of america') or (ans.lower() == 'the united states of america'):
     ans = 'US'
 if (ans.lower() == 'uk') or (ans.lower() == 'england'):
@@ -26,13 +26,15 @@ for key, value in weeklydata.items():
     if value != 0:
         correctdata.update({key: value})
 corona_df = pd.DataFrame({'ds': list(correctdata.keys()), 'y': list(correctdata.values())})
-print(corona_df)
 
 pro = Prophet(daily_seasonality=True)
 pro.fit(corona_df)
 
-future1 = pro.make_future_dataframe(periods=14)
+future1 = pro.make_future_dataframe(periods=7)
 prediction1 = pro.predict(future1)
+
+print(prediction1[['ds', 'yhat']].tail())
+
 pro.plot(prediction1)
 plt.xlabel('Date')
 plt.ylabel('Confirmed')
